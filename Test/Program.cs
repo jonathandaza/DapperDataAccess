@@ -12,7 +12,7 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            SPXDPGenericRepository<Currencies> repo = new SPXDPGenericRepository<Currencies>("ArgosMain");
+            SPXDPGenericRepository<Currencies> repo = new SPXDPGenericRepository<Currencies>("Main");
 
             Currencies currency = new Currencies() {Code = "BIT", Id = 0, Name= "BITCOIN"};
 
