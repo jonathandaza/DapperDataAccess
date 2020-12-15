@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infraestructure.Api.ModelAnalizer", "..\Infraestructure.Api.ModelAnalizer\Infraestructure.Api.ModelAnalizer.csproj", "{F099556C-5B7B-4928-A8D7-A544A5302FE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infraestructure.Api.ModelAnalizer", "..\DapperDataAccess\Infraestructure.Api.ModelAnalizer\Infraestructure.Api.ModelAnalizer.csproj", "{F099556C-5B7B-4928-A8D7-A544A5302FE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infraestructure.Api.SPXDapperDataAccess", "..\Infraestructure.Api.SPXDapperDataAccess\Infraestructure.Api.SPXDapperDataAccess.csproj", "{322F840E-2CE9-4598-973D-D5B9245F5A8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infraestructure.Api.DapperDataAccess", "..\DapperDataAccess\Infraestructure.Api.DapperDataAccess\Infraestructure.Api.DapperDataAccess.csproj", "{322F840E-2CE9-4598-973D-D5B9245F5A8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{577136DD-A535-4548-B094-B9C0BDC26AA3}"
 EndProject
@@ -36,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5216FDB-37D2-49B1-9FA2-F9C88338423B}
 	EndGlobalSection
 EndGlobal

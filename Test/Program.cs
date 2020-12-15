@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Infraestructure.Api.SPXDapperDataAccess;
+using Infraestructure.Api.DapperDataAccess;
 using Models;
 
 namespace Test
@@ -12,7 +12,7 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            SPXDPGenericRepository<Currencies> repo = new SPXDPGenericRepository<Currencies>("Main");
+            DPGenericRepository<Currencies> repo = new DPGenericRepository<Currencies>("Main");
 
             Currencies currency = new Currencies() {Code = "BIT", Id = 0, Name= "BITCOIN"};
 

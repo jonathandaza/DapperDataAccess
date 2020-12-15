@@ -49,9 +49,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Infraestructure.Api.SPXDapperDataAccess\Infraestructure.Api.SPXDapperDataAccess.csproj">
+    <ProjectReference Include="..\..\Infraestructure.Api.SPXDapperDataAccess\Infraestructure.Api.DapperDataAccess.csproj">
       <Project>{322f840e-2ce9-4598-973d-d5b9245f5a8c}</Project>
-      <Name>Infraestructure.Api.SPXDapperDataAccess</Name>
+      <Name>Infraestructure.Api.DapperDataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Models\Models.csproj">
       <Project>{01cc7344-1daa-485a-a0da-14ccbd1057ea}</Project>
