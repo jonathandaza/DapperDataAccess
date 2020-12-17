@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Web.Http;
+﻿using System.Web.Http;
+using Models;
 using app;
-using webapi.Models;
 
 namespace webapi.Controllers
 {
@@ -17,14 +16,12 @@ namespace webapi.Controllers
 
 		[HttpPost]
 		[Route("employees")]
-		public IHttpActionResult Post([FromBody] IEnumerable<Employee> employee)
+		public IHttpActionResult Post([FromBody] Currencies currency)
 		{
 			if (ModelState.IsValid)
 			{
-				//Mapper.CreateMap<Employee, EmployeeDTO>();
-				//var newEmployee = _app.Add(Mapper.Map<EmployeeDTO>(employee));
-					
-				return Ok();
+                var newCurrency = _app.Add(currency);					
+				return Ok(newCurrency);
 			}
 
 			return BadRequest();

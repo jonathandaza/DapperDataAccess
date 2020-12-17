@@ -7,7 +7,11 @@ namespace app
 	{
         Currencies Add(Currencies employeeDto);
 
+        Currencies Update(Currencies employeeDto);
+
         IEnumerable<Currencies> Get();
+
+        Currencies Get(int id);
     }
 }
 
