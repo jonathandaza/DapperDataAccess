@@ -1,15 +1,16 @@
 ﻿using System.Web.Http;
+using System.Net;
 using Models;
 using app;
 
 namespace WebApi.Controllers
 {
 	[RoutePrefix("api/v1")]
-    public class EmployeeController : ApiController
+    public class CurrencyController : ApiController
 	{
 		private readonly IApp _app;
 
-		public EmployeeController(IApp app)
+		public CurrencyController(IApp app)
 		{
 			_app = app;
 		}
@@ -44,26 +45,22 @@ namespace WebApi.Controllers
         [Route("currencies")]
         public IHttpActionResult Get()
         {
-            if (ModelState.IsValid)
-            {
-                var newCurrency = _app.Get();
-                return Ok(newCurrency);
-            }
+            var currency = _app.Get();
+            if (currency == null)
+                return StatusCode(HttpStatusCode.NoContent);
 
-            return BadRequest();
+            return Ok(currency);
         }
 
         [HttpGet]
         [Route("currencies/{id}")]
         public IHttpActionResult Get(int id)
         {
-            if (ModelState.IsValid)
-            {
-                var newCurrency = _app.Get(id);
-                return Ok(newCurrency);
-            }
+            var currency = _app.Get(id);
+            if (currency == null)
+                return StatusCode(HttpStatusCode.NoContent);
 
-            return BadRequest();
+            return Ok(currency);
         }
     }
 }
