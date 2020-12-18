@@ -188,6 +188,20 @@ namespace Infraestructure.Api.DapperDataAccess
             });
         }
 
+        public int Create(T model, ref int? id)
+        {
+            model = queryConstructor.SanitizeModel(model);
+            queryConstructor.validateInsert(model);
+            int? executionResult;
+
+            executionResult = ConnectExcecute(c =>
+            {
+                id = c.Query<int?>(queryConstructor.CreateInsertInto(model), model).FirstOrDefault();
+            });
+
+            return executionResult ?? 0;
+        }
+
         public async Task<IEnumerable<int>> DeleteAsync(Filter[] filters)
         {
             filters = queryConstructor.SanitizeFilters(filters);

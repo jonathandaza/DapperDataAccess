@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using FluentValidation;
-using webapi.Models;
+using WebApi.Models;
 
-namespace webapi.Controllers.Validators
+namespace WebApi.Controllers.Validators
 {
 	public class EmployeeValidator : AbstractValidator<Employee>
 	{

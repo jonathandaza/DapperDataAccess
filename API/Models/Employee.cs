@@ -1,8 +1,8 @@
 ﻿using Console.Models.Validators;
 using FluentValidation.Attributes;
-using webapi.Controllers.Validators;
+using WebApi.Controllers.Validators;
 
-namespace webapi.Models
+namespace WebApi.Models
 {
 	public class Employee
 	{

@@ -1,6 +1,6 @@
 ﻿using Topshelf;
 
-namespace webapi
+namespace WebApi
 {
 	class Program
 	{
@@ -10,9 +10,9 @@ namespace webapi
 			{
 				c.RunAsLocalSystem();
 
-				c.Service<MyService>(s =>
+				c.Service<Service>(s =>
 				{
-					s.ConstructUsing(name => new MyService());
+					s.ConstructUsing(name => new Service());
 					s.WhenStarted((service, control) => service.Start(control));
 					s.WhenStopped((service, control) => service.Stop(control));
 				});

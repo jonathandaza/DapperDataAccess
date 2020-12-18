@@ -1,25 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Formatting;
-using System.Reflection;
-using System.Web.Http;
-using System.Web.Http.ExceptionHandling;
-using app;
-using Console.Controllers.Validators;
-using Console.Filters;
-using Console.Models.Validators;
-using FluentValidation;
-using FluentValidation.WebApi;
-using Microsoft.Practices.Unity;
-using Newtonsoft.Json;
+﻿using Console.Controllers.Validators;
 using Newtonsoft.Json.Serialization;
+using WebApi.Controllers.Validators;
+using System.Net.Http.Formatting;
+using System.Collections.Generic;
+using Console.Models.Validators;
+using Microsoft.Practices.Unity;
+using FluentValidation.WebApi;
+using FluentValidation;
+using System.Web.Http;
+using Console.Filters;
+using Newtonsoft.Json;
+using WebApi.Models;
+using System.Linq;
 using Owin;
-using webapi.Controllers.Validators;
-using webapi.Models;
+using app;
 
-namespace webapi
+namespace WebApi
 {
-	public class Startup
+    public class Startup
 	{
 		private UnityContainer _container;
 
@@ -44,9 +42,8 @@ namespace webapi
 		private void SettingConfig(HttpConfiguration config)
 		{
 			config.DependencyResolver = new UnityResolver(_container);
-			//config.Services.Replace(typeof(IExceptionHandler), new ApiExceptionHandler());
 			config.Filters.Add(new RestfulModelStateFilterAttribute());
-			FluentValidationModelValidatorProvider.Configure(config, p=> p.ValidatorFactory = new UnityValidatorFactory(_container));
+			//FluentValidationModelValidatorProvider.Configure(config, p=> p.ValidatorFactory = new UnityValidatorFactory(_container));
 
 
 			config.MapHttpAttributeRoutes();
@@ -65,9 +62,9 @@ namespace webapi
 
 		private void ConfigureValidators()
 		{
-			_container.RegisterType<IValidator<IEnumerable<Employee>>, EmployeeListValidator>();
-			_container.RegisterType(typeof(IValidator<>), typeof(EmployeeValidator));
-			_container.RegisterType<IValidator<Employee>, EmployeeValidator>();
+			//_container.RegisterType<IValidator<IEnumerable<Employee>>, EmployeeListValidator>();
+			//_container.RegisterType(typeof(IValidator<>), typeof(EmployeeValidator));
+			//_container.RegisterType<IValidator<Employee>, EmployeeValidator>();
 		}
 		
 	}

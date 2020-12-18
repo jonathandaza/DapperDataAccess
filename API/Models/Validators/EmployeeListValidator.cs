@@ -2,8 +2,8 @@
 using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
-using webapi.Controllers.Validators;
-using webapi.Models;
+using WebApi.Controllers.Validators;
+using WebApi.Models;
 
 namespace Console.Models.Validators
 {

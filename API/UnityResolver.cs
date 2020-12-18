@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web.Http.Dependencies;
 using Microsoft.Practices.Unity;
 
-namespace webapi
+namespace WebApi
 {
 	public class UnityResolver : IDependencyResolver
 	{
