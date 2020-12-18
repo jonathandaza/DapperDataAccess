@@ -11,8 +11,15 @@ namespace app
 
         public Currencies Add(Currencies currency)
 	    {
-            var id = _repositoryCurrency.Create(currency);
-            return currency;
+            Currencies currencyResult = null;
+
+            _repositoryCurrency.Create(currency, out int idCurrency);
+            if (idCurrency > 0)
+            {
+                currencyResult = Get(idCurrency);
+            }
+
+            return currencyResult;
         }
 
         public IEnumerable<Currencies> Get()
