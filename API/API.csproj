@@ -115,11 +115,8 @@
     <Compile Include="Controllers\CurrencyController.cs" />
     <Compile Include="Filters\RestfulModelStateFilterAttribute.cs" />
     <Compile Include="Filters\ApiResourceValidationErrorWrapper.cs" />
-    <Compile Include="Models\Validators\EmployeeListValidator.cs" />
     <Compile Include="Models\Validators\FluentValidationExtensions.cs" />
     <Compile Include="Models\Validators\UnityValidatorFactory.cs" />
-    <Compile Include="Models\Validators\EmployeeValidator.cs" />
-    <Compile Include="Models\Employee.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.cs" />

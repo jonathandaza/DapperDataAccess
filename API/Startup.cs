@@ -1,6 +1,6 @@
 ﻿using Console.Controllers.Validators;
 using Newtonsoft.Json.Serialization;
-using WebApi.Controllers.Validators;
+//using WebApi.Controllers.Validators;
 using System.Net.Http.Formatting;
 using System.Collections.Generic;
 using Console.Models.Validators;
@@ -10,7 +10,7 @@ using FluentValidation;
 using System.Web.Http;
 using Console.Filters;
 using Newtonsoft.Json;
-using WebApi.Models;
+//using WebApi.Models;
 using System.Linq;
 using Owin;
 using app;
