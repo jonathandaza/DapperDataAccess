@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using Models;
+using Models.Output;
 
 namespace app
 {
 	public interface IApp
 	{
-        Currencies Add(Currencies employeeDto);
+        ResponseMessage Add(Currencies employeeDto);
 
-        Currencies Update(Currencies employeeDto);
+        ResponseMessage Update(Currencies employeeDto);
 
         IEnumerable<Currencies> Get();
 

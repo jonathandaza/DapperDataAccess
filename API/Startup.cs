@@ -14,6 +14,8 @@ using Newtonsoft.Json;
 using System.Linq;
 using Owin;
 using app;
+using Models;
+using Application.Validators;
 
 namespace WebApi
 {
@@ -62,9 +64,9 @@ namespace WebApi
 
 		private void ConfigureValidators()
 		{
-			//_container.RegisterType<IValidator<IEnumerable<Employee>>, EmployeeListValidator>();
 			//_container.RegisterType(typeof(IValidator<>), typeof(EmployeeValidator));
-			//_container.RegisterType<IValidator<Employee>, EmployeeValidator>();
+			_container.RegisterType<IValidator<IEnumerable<Currencies>>, CurrenciesListValidator>();
+			_container.RegisterType<IValidator<Currencies>, CurrenciesValidator>();
 		}
 		
 	}

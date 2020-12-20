@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Practices.Unity;
 using FluentValidation;
-using FluentValidation.Results;
-using Microsoft.Practices.Unity;
+using System;
 
 namespace Console.Controllers.Validators
 {

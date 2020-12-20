@@ -37,9 +37,8 @@
       <HintPath>..\packages\AutoMapper.4.1.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentValidation, Version=5.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentValidation.5.6.2.0\lib\Net45\FluentValidation.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FluentValidation, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7de548da2fbae0f0, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentValidation.9.3.0\lib\net461\FluentValidation.dll</HintPath>
     </Reference>
     <Reference Include="FluentValidation.WebApi, Version=5.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentValidation.WebApi.5.6.2.0\lib\Net45\FluentValidation.WebApi.dll</HintPath>
@@ -114,7 +113,6 @@
   <ItemGroup>
     <Compile Include="Controllers\CurrencyController.cs" />
     <Compile Include="Filters\RestfulModelStateFilterAttribute.cs" />
-    <Compile Include="Filters\ApiResourceValidationErrorWrapper.cs" />
     <Compile Include="Models\Validators\FluentValidationExtensions.cs" />
     <Compile Include="Models\Validators\UnityValidatorFactory.cs" />
     <Compile Include="Program.cs" />

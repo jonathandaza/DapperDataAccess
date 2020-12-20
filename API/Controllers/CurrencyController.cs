@@ -2,6 +2,7 @@
 using System.Net;
 using Models;
 using app;
+using Console.Filters;
 
 namespace WebApi.Controllers
 {
@@ -17,7 +18,8 @@ namespace WebApi.Controllers
 
 		[HttpPost]
 		[Route("currencies")]
-		public IHttpActionResult Post([FromBody] Currencies currency)
+        [RestfulModelStateFilter] 
+        public IHttpActionResult Post([FromBody] Currencies currency)
 		{
 			if (ModelState.IsValid)
 			{

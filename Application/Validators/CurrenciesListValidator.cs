@@ -5,7 +5,7 @@ using Models;
 
 namespace Application.Validators
 {
-    class CurrenciesListValidator : AbstractValidator<IEnumerable<Currencies>>
+    public class CurrenciesListValidator : AbstractValidator<IEnumerable<Currencies>>
     {
         public override ValidationResult Validate(ValidationContext<IEnumerable<Currencies>> instance)
         {
