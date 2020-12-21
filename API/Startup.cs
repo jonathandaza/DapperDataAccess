@@ -46,8 +46,6 @@ namespace WebApi
 			config.DependencyResolver = new UnityResolver(_container);
 			config.Filters.Add(new RestfulModelStateFilterAttribute());
 			//FluentValidationModelValidatorProvider.Configure(config, p=> p.ValidatorFactory = new UnityValidatorFactory(_container));
-
-
 			config.MapHttpAttributeRoutes();
 		}
 

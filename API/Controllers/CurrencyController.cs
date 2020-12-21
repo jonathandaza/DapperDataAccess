@@ -1,8 +1,8 @@
-﻿using System.Web.Http;
+﻿using Console.Filters;
+using System.Web.Http;
 using System.Net;
 using Models;
 using app;
-using Console.Filters;
 
 namespace WebApi.Controllers
 {
@@ -21,13 +21,13 @@ namespace WebApi.Controllers
         [RestfulModelStateFilter] 
         public IHttpActionResult Post([FromBody] Currencies currency)
 		{
-			if (ModelState.IsValid)
-			{
-                var newCurrency = _app.Add(currency);					
-				return Ok(newCurrency);
-			}
+            var response = _app.Add(currency);
+            if (response.WasSuccessful())
+            {
+                return Ok(currency);
+            }
 
-			return BadRequest();
+			return BadRequest(response.SerializeMessage);
 		}
 
         [HttpPut]

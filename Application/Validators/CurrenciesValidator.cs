@@ -7,13 +7,12 @@ namespace Application.Validators
     {
         public CurrenciesValidator()
         {
-            RuleFor(p => p.Id).NotNull().NotEmpty();
             RuleFor(p => p.Code).
-                NotNull().WithMessage("Code must not be empty").
-                Length(1,5).WithMessage("invalid length");
+                NotNull().WithMessage("'{PropertyName}' must not be empty").
+                Length(1,5).WithMessage("'{PropertyName}' invalid length, it should be between '{MinLength}' and '{MaxLength}'");
             RuleFor(p => p.Name).
-                NotNull().WithMessage("Name must not be empty").
-                Length(1, 5).WithMessage("invalid length");
+                NotNull().WithMessage("'{PropertyName}' must not be empty").
+                Length(1, 50).WithMessage("'{PropertyName}' invalid length, it should be between '{MinLength}' and '{MaxLength}'");
         }
     }
 }

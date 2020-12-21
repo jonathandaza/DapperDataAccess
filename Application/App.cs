@@ -1,9 +1,9 @@
 ﻿using Infraestructure.Api.DapperDataAccess;
 using System.Collections.Generic;
-using System.Linq;
-using Models;
 using FluentValidation;
 using Models.Output;
+using System.Linq;
+using Models;
 
 namespace app
 {

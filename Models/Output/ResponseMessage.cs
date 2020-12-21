@@ -27,7 +27,7 @@ namespace Models.Output
         {
             set { _tipeEnum = value; }
             get { return _tipeEnum; }
-        }        
+        }
 
         [DataMember]
         public string TransationsNumber { get; set; }
@@ -42,6 +42,11 @@ namespace Models.Output
         public string SerializeMessage
         {
             get { return string.Join("|", Messages); }
+        }
+
+        public bool WasSuccessful()
+        {
+            return TypeEnum == Types.Information;
         }
     }
 }
