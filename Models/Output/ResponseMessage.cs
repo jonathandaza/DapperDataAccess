@@ -5,7 +5,6 @@ namespace Models.Output
 {
     public class ResponseMessage
     {
-        private Types _tipeEnum;
         private IEnumerable<string> _messages;
 
         public enum Types
@@ -19,15 +18,11 @@ namespace Models.Output
 
         public ResponseMessage()
         {
-            _tipeEnum = Types.Information;
+            TypeEnum = Types.Information;
         }
 
         [IgnoreDataMember]
-        public Types TypeEnum
-        {
-            set { _tipeEnum = value; }
-            get { return _tipeEnum; }
-        }
+        public Types TypeEnum { set; get; }
 
         [DataMember]
         public string TransationsNumber { get; set; }

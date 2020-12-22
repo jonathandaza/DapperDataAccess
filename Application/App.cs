@@ -11,11 +11,14 @@ namespace app
     {
         readonly DPGenericRepository<Currencies> _repositoryCurrency = new DPGenericRepository<Currencies>("Main");
 
-        readonly IValidator<Currencies> _validatorCurrencies;
+        readonly IValidator<Currencies> _currenciesValidator;
+        readonly IValidator<IEnumerable<Currencies>> _currenciesListValidator;
 
-        public App(IValidator<Currencies> validatorCurrencies)
+        public App(IValidator<Currencies> currenciesValidator,
+                   IValidator<IEnumerable<Currencies>> currenciesListValidator)
         {
-            _validatorCurrencies = validatorCurrencies;
+            _currenciesValidator = currenciesValidator;
+            _currenciesListValidator = currenciesListValidator;
         }
 
         public ResponseMessage Add(Currencies currency)
@@ -23,7 +26,7 @@ namespace app
             ResponseMessage responseMessage = new ResponseMessage();
             Currencies currencyResult = null;
 
-            var validation = _validatorCurrencies.Validate(currency);
+            var validation = _currenciesValidator.Validate(currency);
             if (!validation.IsValid)
             {
                 responseMessage.Messages.Add(string.Join("|", validation.Errors));
@@ -35,6 +38,31 @@ namespace app
             if (idCurrency > 0)
             {
                 currencyResult = Get(idCurrency);
+            }
+
+            return responseMessage;
+        }
+
+        public ResponseMessage Add(IEnumerable<Currencies> currencies)
+        {
+            ResponseMessage responseMessage = new ResponseMessage();
+            Currencies currencyResult = null;
+
+            var validation = _currenciesListValidator.Validate(currencies);
+            if (!validation.IsValid)
+            {
+                responseMessage.Messages.Add(string.Join("|", validation.Errors));
+                responseMessage.TypeEnum = ResponseMessage.Types.Error;
+                return responseMessage;
+            }
+
+            foreach (var currency in currencies)
+            {
+                _repositoryCurrency.Create(currency, out int idCurrency);
+                if (idCurrency > 0)
+                {
+                    currencyResult = Get(idCurrency);
+                }
             }
 
             return responseMessage;

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Infrastructure.Resources.Validations;
+using FluentValidation;
 using Models;
 
 namespace Application.Validators
@@ -8,11 +9,11 @@ namespace Application.Validators
         public CurrenciesValidator()
         {
             RuleFor(p => p.Code).
-                NotNull().WithMessage("'{PropertyName}' must not be empty").
-                Length(1,5).WithMessage("'{PropertyName}' invalid length, it should be between '{MinLength}' and '{MaxLength}'");
+                NotNull().WithMessage(ValidationMessages.Mandatory).
+                Length(1,5).WithMessage(ValidationMessages.InvalidLength);
             RuleFor(p => p.Name).
-                NotNull().WithMessage("'{PropertyName}' must not be empty").
-                Length(1, 50).WithMessage("'{PropertyName}' invalid length, it should be between '{MinLength}' and '{MaxLength}'");
+                NotNull().WithMessage(ValidationMessages.Mandatory).
+                Length(1, 50).WithMessage(ValidationMessages.InvalidLength);
         }
     }
 }

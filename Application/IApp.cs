@@ -6,9 +6,11 @@ namespace app
 {
 	public interface IApp
 	{
-        ResponseMessage Add(Currencies employeeDto);
+        ResponseMessage Add(Currencies currency);
 
-        ResponseMessage Update(Currencies employeeDto);
+        ResponseMessage Add(IEnumerable<Currencies> currencies);
+
+        ResponseMessage Update(Currencies currency);
 
         IEnumerable<Currencies> Get();
 

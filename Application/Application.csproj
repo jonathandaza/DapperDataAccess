@@ -55,6 +55,10 @@
       <Project>{322f840e-2ce9-4598-973d-d5b9245f5a8c}</Project>
       <Name>Infraestructure.Api.DapperDataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Resources\Infrastructure.Resources.csproj">
+      <Project>{0f758db3-5e9e-4d62-a447-0c6c7546b30a}</Project>
+      <Name>Infrastructure.Resources</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Models\Models.csproj">
       <Project>{01cc7344-1daa-485a-a0da-14ccbd1057ea}</Project>
       <Name>Models</Name>
