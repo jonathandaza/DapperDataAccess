@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
+using System.IO;
+using System;
 
 namespace Infrastructure.Helper.Utilities.Extensions
 {
@@ -28,7 +28,7 @@ namespace Infrastructure.Helper.Utilities.Extensions
         /// <returns>Objeto de tipo <see cref="string"/> Con el texto encriptado</returns>
         public static string EncriptarTextoEnUtf8(this string value)
         {
-            const string clave = "#f2xT10#";
+            const string clave = "#KEY_PRIVATE#";
             string textoEncriptado;
 
             using (var DES = new DESCryptoServiceProvider())
@@ -57,7 +57,7 @@ namespace Infrastructure.Helper.Utilities.Extensions
         /// <returns>Objeto de tipo <see cref="string"/> Con el texto desencriptado</returns>
         public static string DesencriptarTextoUtf8(this string value)
         {
-            const string clave = "#f2xT10#";
+            const string clave = "#KEY_PRIVATE#";
             string textoOriginal;
 
             using (var DES = new DESCryptoServiceProvider())

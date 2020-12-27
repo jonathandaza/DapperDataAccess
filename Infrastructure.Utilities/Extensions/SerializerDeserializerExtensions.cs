@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.IO;
+﻿using System.Xml.Serialization;
 using System.Xml;
-using System.Xml.Serialization;
+using System.IO;
+using System;
 
 namespace F2X.Interoperabilidad.Operador.Infrastructure.Helper.Utilities.Extensions
 {
     public static class SerializerDeserializerExtensions
-    {
-
-        // why is this Hashtable? due to the threading semantics!
-        //private static readonly Hashtable serializerCache = new Hashtable();
-
+    {        
         /// <summary>
         /// Convierte un objeto a un array de bytes, interfaces de colecciones no las puede convertir como IEnumerable, ICollection, IList, etc.
         /// </summary>
@@ -24,25 +19,6 @@ namespace F2X.Interoperabilidad.Operador.Infrastructure.Helper.Utilities.Extensi
             {
                 throw new ArgumentNullException();
             }
-
-            //var defaultNamespace = Guid.NewGuid().ToString("N");
-
-            //Type type = @object.GetType();
-            //var cacheKey = new { Type = type, Name = defaultNamespace };
-            //XmlSerializer xmlSerializer = (XmlSerializer)serializerCache[cacheKey];
-            
-            //if (xmlSerializer == null)
-            //{
-            //    lock (serializerCache)
-            //    { // double-checked
-            //        xmlSerializer = (XmlSerializer)serializerCache[cacheKey];
-            //        if (xmlSerializer == null)
-            //        {
-            //            xmlSerializer = new XmlSerializer(type, new XmlRootAttribute(defaultNamespace));
-            //            serializerCache.Add(cacheKey, xmlSerializer);
-            //        }
-            //    }
-            //}
 
             try
             {
