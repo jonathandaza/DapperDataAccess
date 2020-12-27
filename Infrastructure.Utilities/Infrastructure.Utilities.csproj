@@ -49,6 +49,7 @@
     <Compile Include="Extensions\ObjectExtension.cs" />
     <Compile Include="Extensions\SerializerDeserializerExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
