@@ -181,6 +181,135 @@ namespace Infrastructure.Utilities
             }
             return null;
         }
+
+        public static void CreateCSVFile(DataTable dtTable, string filePath)
+        {
+            const string semicolon = ";";
+
+            using (var outfile = new StreamWriter(filePath, true, Encoding.GetEncoding("ISO-8859-1")))
+            {
+                //Crea Los Nombres Encabazados
+                var arrColumnas = new string[dtTable.Columns.Count];
+                var sbHead = new StringBuilder();
+
+                for (int i = 0; i < dtTable.Columns.Count; i++)
+                {
+                    arrColumnas[i] = dtTable.Columns[i].ColumnName;
+                }
+
+                sbHead.Append(String.Join(semicolon, arrColumnas));
+                outfile.WriteLine(sbHead.ToString());
+
+                // Crea las Lineas
+                foreach (DataRow row in dtTable.Rows)
+                {
+                    var sb = new StringBuilder();
+                    sb.Append(String.Join(semicolon, row.ItemArray));
+                    outfile.WriteLine(sb.ToString());
+                }
+            }
+        }
+
+        public static void CreateCSVFile<T>(string separator, IEnumerable<T> objectlist, string fullPath)
+        {
+            Type t = typeof(T);
+            PropertyInfo[] fields = t.GetProperties();
+
+            string header = String.Join(separator, fields.Select(f => f.Name).ToArray());
+
+            StringBuilder csvdata = new StringBuilder();
+            csvdata.AppendLine(header);
+
+            foreach (var o in objectlist)
+                csvdata.AppendLine(ToCsvFields(separator, fields, o));
+
+            using (StreamWriter file = File.CreateText($"{fullPath}.csv"))
+            {
+                file.WriteLine(csvdata.ToString());
+            }
+        }
+
+        public static void CreateCSVFile<T>(string separator, IEnumerable<T> objectlist, string folder, string fileName, out string pathName)
+        {
+            try
+            {
+                Type t = typeof(T);
+                PropertyInfo[] fields = t.GetProperties();
+
+                string header = string.Join(separator, fields.Select(f => f.Name).ToArray());
+
+                StringBuilder csvdata = new StringBuilder();
+                csvdata.AppendLine(header);
+
+                foreach (var o in objectlist)
+                    csvdata.AppendLine(ToCsvFields(separator, fields, o));
+
+                pathName = Path.Combine(folder, $"{fileName}.txt");
+
+                var directoryInfo = new DirectoryInfo(folder);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (StreamWriter file = File.CreateText($"{pathName}"))
+                {
+                    file.WriteLine(csvdata.ToString());
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public static string ToCsvFields(string separator, PropertyInfo[] fields, object o)
+        {
+            StringBuilder linie = new StringBuilder();
+
+            foreach (var f in fields)
+            {
+                if (linie.Length > 0)
+                    linie.Append(separator);
+
+                var x = f.GetValue(o);
+
+                if (x != null)
+                    linie.Append(x.ToString());
+            }
+
+            return linie.ToString();
+        }
+
+        /// <summary>
+        /// Método para crear un archivo de texto basado en el objeto que se envie
+        /// </summary>
+        /// <typeparam name="T">Tipo de objeto a ser persistido en un archivo de texto</typeparam>
+        /// <param name="sorce">Datos del objeto tipo <see cref="T"/></param>
+        /// <param name="folder">Directorio adonde  se va persistir el archivo de texto</param>
+        /// <param name="fileName">Nombre del archivo</param>
+        /// <param name="pathName">Ruta donde queda almacenaod el archivo de texto</param>
+        public static void CreateTXTFile<T>(T sorce, string folder, string fileName, out string pathName)
+        {
+            try
+            {
+                pathName = Path.Combine(folder, $"{fileName}.txt");
+
+                var directoryInfo = new DirectoryInfo(folder);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (StreamWriter file = File.CreateText(pathName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+
+                    //serialize object directly into file stream
+                    serializer.Serialize(file, sorce);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }
 
