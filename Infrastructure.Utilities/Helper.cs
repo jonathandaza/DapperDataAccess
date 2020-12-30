@@ -6,6 +6,7 @@ using System.Data.OleDb;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -309,6 +310,50 @@ namespace Infrastructure.Utilities
             {
                 throw;
             }
+        }
+
+        public static string GetIpAddress()
+        {
+            string ipAddress = null;
+            string hostname = Environment.MachineName; IPHostEntry host = Dns.GetHostEntry(hostname);
+
+            foreach (var ip in host.AddressList.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork))
+            {
+                ipAddress = Convert.ToString(ip);
+            }
+            return ipAddress;
+        }
+
+        public static TResult DeserializarJson<TResult>(string json)
+        {
+            //return JsonConvert.DeserializeObject<TResult>(json);
+            throw new NotImplementedException();
+        }
+
+        public static string SerializarAJson<T>(T source)
+        {
+            //return JsonConvert.SerializeObject(source);
+            throw new NotImplementedException();
+        }
+
+        public static bool CrearImagenDeBytes(string rutaArchivo, byte[] bytesImagen)
+        {
+            if (string.IsNullOrWhiteSpace(rutaArchivo) || bytesImagen == null || bytesImagen.Length == 0)
+                return false;
+
+            if (!Directory.Exists(Path.GetPathRoot(rutaArchivo)))
+                return false;
+
+            var rutaDirectorio = Path.GetDirectoryName(rutaArchivo);
+            if (!Directory.Exists(rutaDirectorio))
+                Directory.CreateDirectory(rutaDirectorio);
+
+            using (var fs = new FileStream(rutaArchivo, FileMode.Create))
+            {
+                fs.Write(bytesImagen, 0, bytesImagen.Length);
+                fs.Close();
+            }
+            return true;
         }
     }
 }
