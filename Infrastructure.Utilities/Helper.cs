@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ionic.Zip;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -312,6 +313,22 @@ namespace Infrastructure.Utilities
             }
         }
 
+        public static T ReadFileTxt<T>(string path)
+        {
+            var fileInfo = new FileInfo(path);
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException($"No se encontró archivo para ser deserializado a JSON. Archivo: {fileInfo.FullName}.");
+            T result;
+
+            using (StreamReader r = new StreamReader(path))
+            {
+                string json = r.ReadToEnd();
+                result = JsonConvert.DeserializeObject<T>(json);
+            }
+
+            return result;
+        }
+
         public static string GetIpAddress()
         {
             string ipAddress = null;
@@ -354,6 +371,61 @@ namespace Infrastructure.Utilities
                 fs.Close();
             }
             return true;
+        }
+
+        public static DateTime? ConvertStringToDate(string fechaEmision, string formato)
+        {
+            DateTime fechaConvertida;
+            if (!DateTime.TryParseExact(fechaEmision, formato, CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaConvertida))
+            {
+                return null;
+            }
+            return fechaConvertida;
+        }
+
+        public static DateTime? ConvertStringToDateUtc(string fechaEmision, string formato)
+        {
+            DateTime fechaConvertida;
+            if (!DateTime.TryParseExact(fechaEmision, formato, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeLocal, out fechaConvertida))
+            {
+                return null;
+            }
+            return fechaConvertida;
+        }
+    }
+
+    public static class Zip
+    {
+        public static T DecompressSnapshot<T>(string path)
+        {
+            FileInfo fileInfo = null;
+            T result;
+
+            try
+            {
+                fileInfo = new FileInfo(path);
+                if (!fileInfo.Exists)
+                    throw new FileNotFoundException($"No se encontró el archivo {path}.");
+
+                using (var zip = ZipFile.Read(fileInfo.FullName))
+                {
+                    zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
+                }
+
+                fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
+                if (!fileInfo.Exists)
+                    throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
+
+                result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+            }
+            finally
+            {
+                if (!fileInfo.Exists)
+                    fileInfo.Delete();
+            }
+
+            return result;
+
         }
     }
 }
