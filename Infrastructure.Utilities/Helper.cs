@@ -184,13 +184,17 @@ namespace Infrastructure.Utilities
             return null;
         }
 
+        /// <summary>
+        /// Creates CSV file from a <see cref="DataTable"/> object
+        /// </summary>
+        /// <param name="dtTable">Data fro being converted to CSV file</param>
+        /// <param name="filePath">file path for being created.</param>
         public static void CreateCSVFile(DataTable dtTable, string filePath)
         {
             const string semicolon = ";";
 
             using (var outfile = new StreamWriter(filePath, true, Encoding.GetEncoding("ISO-8859-1")))
-            {
-                //Crea Los Nombres Encabazados
+            {                
                 var arrColumnas = new string[dtTable.Columns.Count];
                 var sbHead = new StringBuilder();
 
@@ -201,8 +205,7 @@ namespace Infrastructure.Utilities
 
                 sbHead.Append(String.Join(semicolon, arrColumnas));
                 outfile.WriteLine(sbHead.ToString());
-
-                // Crea las Lineas
+                
                 foreach (DataRow row in dtTable.Rows)
                 {
                     var sb = new StringBuilder();
@@ -212,8 +215,17 @@ namespace Infrastructure.Utilities
             }
         }
 
+        /// <summary>
+        /// Creates CSV file from a collection (<see cref="IEnumerable<T>"/>)
+        /// </summary>
+        /// <typeparam name="T">Type of object contained in the collection</typeparam>
+        /// <param name="separator">chacter which each line is going to be separed</param>
+        /// <param name="objectlist">Collection containing the whole information to be created to CSV file </param>
+        /// <param name="fullPath">file path (including file name) where the file will be created.</param>
         public static void CreateCSVFile<T>(string separator, IEnumerable<T> objectlist, string fullPath)
         {
+            const string fileExtension = ".csv";
+
             Type t = typeof(T);
             PropertyInfo[] fields = t.GetProperties();
 
@@ -225,16 +237,26 @@ namespace Infrastructure.Utilities
             foreach (var o in objectlist)
                 csvdata.AppendLine(ToCsvFields(separator, fields, o));
 
-            using (StreamWriter file = File.CreateText($"{fullPath}.csv"))
+            using (StreamWriter file = File.CreateText($"{(fullPath.Contains(fileExtension) ? fullPath : fullPath + fileExtension)}"))
             {
                 file.WriteLine(csvdata.ToString());
             }
         }
 
+        /// <summary>
+        /// Creates CSV file from a collection (<see cref="IEnumerable<T>"/>)
+        /// </summary>
+        /// <typeparam name="T">Type of object contained in the collection</typeparam>
+        /// <param name="separator">chacter which each line is going to be separed</param>
+        /// <param name="objectlist">Collection containing the whole information to be created to CSV file </param>
+        /// <param name="folder">Folder path where the file will be created</param>
+        /// <param name="fileName">File name (without extension)</param>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
         public static void CreateCSVFile<T>(string separator, IEnumerable<T> objectlist, string folder, string fileName, out string pathName)
         {
+            const string fileExtension = ".csv";
             try
-            {
+            {                
                 Type t = typeof(T);
                 PropertyInfo[] fields = t.GetProperties();
 
@@ -246,7 +268,7 @@ namespace Infrastructure.Utilities
                 foreach (var o in objectlist)
                     csvdata.AppendLine(ToCsvFields(separator, fields, o));
 
-                pathName = Path.Combine(folder, $"{fileName}.txt");
+                pathName = Path.Combine(folder, $"{(fileName.Contains(fileExtension) ? fileName : fileName + fileExtension)}");
 
                 var directoryInfo = new DirectoryInfo(folder);
                 if (!directoryInfo.Exists)
@@ -257,12 +279,19 @@ namespace Infrastructure.Utilities
                     file.WriteLine(csvdata.ToString());
                 }
             }
-            catch (Exception)
+            catch
             {
                 throw;
             }
         }
 
+        /// <summary>
+        /// Reads each field over "o" object and, will convert it to string
+        /// </summary>
+        /// <param name="separator">Chacter which each line is going to be separed</param>
+        /// <param name="fields">Fields to be found on "o"</param>
+        /// <param name="o">Object values to be written</param>
+        /// <returns>Returns a <see cref="String"/> object containing the object values "o"</returns>
         public static string ToCsvFields(string separator, PropertyInfo[] fields, object o)
         {
             StringBuilder linie = new StringBuilder();
@@ -282,18 +311,19 @@ namespace Infrastructure.Utilities
         }
 
         /// <summary>
-        /// Método para crear un archivo de texto basado en el objeto que se envie
+        /// Creates TXT file from a <see cref="T"/> object
         /// </summary>
-        /// <typeparam name="T">Tipo de objeto a ser persistido en un archivo de texto</typeparam>
-        /// <param name="sorce">Datos del objeto tipo <see cref="T"/></param>
-        /// <param name="folder">Directorio adonde  se va persistir el archivo de texto</param>
-        /// <param name="fileName">Nombre del archivo</param>
-        /// <param name="pathName">Ruta donde queda almacenaod el archivo de texto</param>
-        public static void CreateTXTFile<T>(T sorce, string folder, string fileName, out string pathName)
+        /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
+        /// <param name="source">Object containing the data in order to be written</param>
+        /// <param name="folder">Folder path where the file will be created</param>
+        /// <param name="fileName">File name (without extension)</param>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
+        public static void CreateTXTFile<T>(T source, string folder, string fileName, out string pathName)
         {
+            const string fileExtension = ".txt";
             try
             {
-                pathName = Path.Combine(folder, $"{fileName}.txt");
+                pathName = Path.Combine(folder, $"{(fileName.Contains(fileExtension) ? fileName : fileName + fileExtension)}");
 
                 var directoryInfo = new DirectoryInfo(folder);
                 if (!directoryInfo.Exists)
@@ -304,7 +334,7 @@ namespace Infrastructure.Utilities
                     JsonSerializer serializer = new JsonSerializer();
 
                     //serialize object directly into file stream
-                    serializer.Serialize(file, sorce);
+                    serializer.Serialize(file, source);
                 }
             }
             catch
