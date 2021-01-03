@@ -426,6 +426,12 @@ namespace Infrastructure.Utilities
 
     public static class Zip
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static T DecompressSnapshot<T>(string path)
         {
             FileInfo fileInfo = null;
@@ -435,7 +441,7 @@ namespace Infrastructure.Utilities
             {
                 fileInfo = new FileInfo(path);
                 if (!fileInfo.Exists)
-                    throw new FileNotFoundException($"No se encontró el archivo {path}.");
+                    throw new FileNotFoundException($"File does not exist. {path}");
 
                 using (var zip = ZipFile.Read(fileInfo.FullName))
                 {
@@ -444,7 +450,7 @@ namespace Infrastructure.Utilities
 
                 fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
                 if (!fileInfo.Exists)
-                    throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
+                    throw new FileNotFoundException($"The zip-file was not found. {fileInfo.FullName}");
 
                 result = Helper.ReadFileTxt<T>(fileInfo.FullName);
             }
@@ -456,6 +462,77 @@ namespace Infrastructure.Utilities
 
             return result;
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="pathExtractTo"></param>
+        /// <returns></returns>
+        public static FileInfo DecompressSnapshot(string path, string pathExtractTo)
+        {
+            FileInfo fileInfo = null;
+            FileInfo result;
+            DirectoryInfo directoryInfo = null;
+
+            try
+            {
+                fileInfo = new FileInfo(path);
+                if (!fileInfo.Exists)
+                    throw new FileNotFoundException($"File does not exist. {path}");
+
+                directoryInfo = new DirectoryInfo(pathExtractTo);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (var zip = ZipFile.Read(fileInfo.FullName))
+                {
+                    zip.ExtractAll(pathExtractTo, ExtractExistingFileAction.OverwriteSilently);
+                }
+
+                result = new FileInfo(Path.Combine(pathExtractTo, $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
+            }
+            finally
+            {
+                if (!fileInfo.Exists)
+                    fileInfo.Delete();
+            }
+
+            if (result.Exists) return result;
+
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static T DecompressSnapshot<T>(string path, string password)
+        {
+            var fileInfo = new FileInfo(path);
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException($"File does not exist. {path}");
+
+            using (var zip = ZipFile.Read(fileInfo.FullName))
+            {
+                zip.Password = password;
+                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
+            }
+
+            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException($"The zip-file was not found. {fileInfo.FullName}");
+
+            T result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+
+            if (!fileInfo.Exists)
+                fileInfo.Delete();
+
+            return result;
         }
     }
 }
