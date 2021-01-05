@@ -534,6 +534,58 @@ namespace Infrastructure.Utilities
 
             return result;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileInfo"></param>
+        /// <returns></returns>
+        public static T DecompressSnapshot<T>(FileInfo fileInfo)
+        {
+            using (var zip = ZipFile.Read(fileInfo.FullName))
+            {
+                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
+            }
+
+            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
+
+            T result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+
+            if (!fileInfo.Exists)
+                fileInfo.Delete();
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileInfo"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static T DecompressSnapshot<T>(FileInfo fileInfo, string password)
+        {
+            using (var zip = ZipFile.Read(fileInfo.FullName))
+            {
+                zip.Password = password;
+                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
+            }
+
+            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
+            if (!fileInfo.Exists)
+                throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
+
+            T result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+
+            if (!fileInfo.Exists)
+                fileInfo.Delete();
+
+            return result;
+        }
     }
 }
 
