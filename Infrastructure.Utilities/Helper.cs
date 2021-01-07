@@ -586,6 +586,42 @@ namespace Infrastructure.Utilities
 
             return result;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string CompressSnapshot<T>(T source, string path)
+        {
+            string pathFileZip = String.Empty;
+
+            var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
+            if (!directoryInfoZip.Exists)
+                directoryInfoZip.Create();
+
+            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
+
+            Infrastructure.Helper.Utilities.Helpers.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+
+            if (String.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+
+            using (ZipFile zip = new ZipFile())
+            {
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                zip.AddFile(pathName, String.Empty);
+                zip.Save(pathFileZip);
+            }
+
+            var fileInfo = new FileInfo(pathName);
+            if (fileInfo.Exists)
+                fileInfo.Delete();
+
+            return pathFileZip;
+        }
     }
 }
 
