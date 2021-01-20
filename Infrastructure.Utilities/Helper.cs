@@ -604,7 +604,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
 
-            Infrastructure.Helper.Utilities.Helpers.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -629,7 +629,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
 
-            Infrastructure.Helper.Utilities.Helpers.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -637,6 +637,32 @@ namespace Infrastructure.Utilities
             using (ZipFile zip = new ZipFile())
             {
                 pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                zip.AddFile(pathName, String.Empty);
+                zip.Save(pathFileZip);
+            }
+
+            var fileInfo = new FileInfo(pathName);
+            if (fileInfo.Exists)
+                fileInfo.Delete();
+
+            return pathFileZip;
+        }
+
+        public static string CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, string password)
+        {
+            string pathFileZip = String.Empty;
+
+            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
+
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+
+            if (String.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+
+            using (ZipFile zip = new ZipFile())
+            {
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                zip.Password = password;
                 zip.AddFile(pathName, String.Empty);
                 zip.Save(pathFileZip);
             }
@@ -658,7 +684,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
 
-            Infrastructure.Helper.Utilities.Helpers.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -691,7 +717,7 @@ namespace Infrastructure.Utilities
                     directoryInfoZip.Create();
 
                 var fileTxt = string.Format(Path.GetFileNameWithoutExtension(path));
-                Infrastructure.Helper.Utilities.Helpers.CreateCSVFile<T>(";", source, Path.GetTempPath(), fileTxt, out pathName);
+                Helper.CreateCSVFile<T>(";", source, Path.GetTempPath(), fileTxt, out pathName);
 
                 if (string.IsNullOrEmpty(pathName))
                     throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -711,32 +737,87 @@ namespace Infrastructure.Utilities
                 if (fileInfo.Exists)
                     fileInfo.Delete();
             }
+        }
 
-            public static void CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, out FileInfo fileInfoFileZip)
+        public static void CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, out FileInfo fileInfoFileZip)
+        {
+            string pathFileZip = String.Empty;
+
+            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
+
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+
+            if (String.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+
+            using (ZipFile zip = new ZipFile())
             {
-                string pathFileZip = String.Empty;
-
-                var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
-
-                Infrastructure.Helper.Utilities.Helpers.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-                if (String.IsNullOrEmpty(pathName))
-                    throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-                using (ZipFile zip = new ZipFile())
-                {
-                    pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                    zip.AddFile(pathName, String.Empty);
-                    zip.Save(pathFileZip);
-                }
-
-                var fileInfo = new FileInfo(pathName);
-                if (fileInfo.Exists)
-                    fileInfo.Delete();
-
-                fileInfoFileZip = new FileInfo(pathFileZip);
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                zip.AddFile(pathName, String.Empty);
+                zip.Save(pathFileZip);
             }
 
+            var fileInfo = new FileInfo(pathName);
+            if (fileInfo.Exists)
+                fileInfo.Delete();
+
+            fileInfoFileZip = new FileInfo(pathFileZip);
+        }
+
+        public static void CompressSnapshot<T>(T source, string path, string password, out FileInfo fileInfoFileZip)
+        {
+            string pathFileZip = String.Empty;
+
+            var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
+            if (!directoryInfoZip.Exists)
+                directoryInfoZip.Create();
+
+            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
+
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+
+            if (String.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+
+            using (ZipFile zip = new ZipFile())
+            {
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                zip.Password = password;
+                zip.AddFile(pathName, String.Empty);
+                zip.Save(pathFileZip);
+            }
+
+            var fileInfo = new FileInfo(pathName);
+            if (fileInfo.Exists)
+                fileInfo.Delete();
+
+            fileInfoFileZip = new FileInfo(pathFileZip);
+        }
+
+        public static void CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, string password, out FileInfo fileInfoFileZip)
+        {
+            string pathFileZip = String.Empty;
+
+            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
+
+            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+
+            if (String.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"No se encontró el archivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+
+            using (ZipFile zip = new ZipFile())
+            {
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                zip.Password = password;
+                zip.AddFile(pathName, String.Empty);
+                zip.Save(pathFileZip);
+            }
+
+            var fileInfo = new FileInfo(pathName);
+            if (fileInfo.Exists)
+                fileInfo.Delete();
+
+            fileInfoFileZip = new FileInfo(pathFileZip);
         }
     }
 }
