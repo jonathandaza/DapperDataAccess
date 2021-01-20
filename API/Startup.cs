@@ -1,6 +1,6 @@
 ﻿using Console.Controllers.Validators;
 using Newtonsoft.Json.Serialization;
-using WebApi.Controllers.Validators;
+//using WebApi.Controllers.Validators;
 using System.Net.Http.Formatting;
 using System.Collections.Generic;
 using Console.Models.Validators;
@@ -10,10 +10,12 @@ using FluentValidation;
 using System.Web.Http;
 using Console.Filters;
 using Newtonsoft.Json;
-using WebApi.Models;
+//using WebApi.Models;
 using System.Linq;
 using Owin;
 using app;
+using Models;
+using Application.Validators;
 
 namespace WebApi
 {
@@ -44,8 +46,6 @@ namespace WebApi
 			config.DependencyResolver = new UnityResolver(_container);
 			config.Filters.Add(new RestfulModelStateFilterAttribute());
 			//FluentValidationModelValidatorProvider.Configure(config, p=> p.ValidatorFactory = new UnityValidatorFactory(_container));
-
-
 			config.MapHttpAttributeRoutes();
 		}
 
@@ -62,9 +62,9 @@ namespace WebApi
 
 		private void ConfigureValidators()
 		{
-			//_container.RegisterType<IValidator<IEnumerable<Employee>>, EmployeeListValidator>();
 			//_container.RegisterType(typeof(IValidator<>), typeof(EmployeeValidator));
-			//_container.RegisterType<IValidator<Employee>, EmployeeValidator>();
+			_container.RegisterType<IValidator<IEnumerable<Currencies>>, CurrenciesListValidator>();
+			_container.RegisterType<IValidator<Currencies>, CurrenciesValidator>();
 		}
 		
 	}
