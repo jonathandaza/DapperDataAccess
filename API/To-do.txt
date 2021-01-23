@@ -8,3 +8,22 @@
 3. Utitilies Library
 4. Resource Library
 5. Hosting: selfhost or IIS
+6. Bring auto-mapper from T9.Agente project
+
+
+resorces:
+Trx queries and Unit of work: 
+	* https://github.com/graciaheys/DapperUnitOfWorkk
+	* https://www.youtube.com/watch?v=vje1sCAugDc
+Logger and others interesting utilities
+	https://www.youtube.com/watch?v=uS0hRJqamfU
+
+A completed project .NET core plus Front-end Angular
+	https://www.youtube.com/watch?v=FfTzG-8B5xQ&list=PL_NVFNExoAxclqXo9fLAeP0G2Qp56Fu8C&index=2
+
+
+InterSystems Developers channel
+	https://www.youtube.com/channel/UCPdsARw9vriybylWSjGrd0A
+
+Git
+	https://youtu.be/8JJ101D3knE
