@@ -1,4 +1,5 @@
 ﻿using Ionic.Zip;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Utilities
 {
@@ -343,11 +343,17 @@ namespace Infrastructure.Utilities
             }
         }
 
-        public static T ReadFileTxt<T>(string path)
+        /// <summary>
+        /// Reads a JSON file from a path
+        /// </summary>
+        /// <typeparam name="T">Type of object to deserialize the JSON</typeparam>
+        /// <param name="path">file path (including file name) where the file will be read.</param>
+        /// <returns>Returns a <see cref="T"/> object containing the object already deserialized</returns>
+        public static T ReadFileJson<T>(string path)
         {
             var fileInfo = new FileInfo(path);
             if (!fileInfo.Exists)
-                throw new FileNotFoundException($"No se encontró archivo para ser deserializado a JSON. Archivo: {fileInfo.FullName}.");
+                throw new FileNotFoundException($"The JSON file was not found . Path: {fileInfo.FullName}.");
             T result;
 
             using (StreamReader r = new StreamReader(path))
@@ -359,10 +365,15 @@ namespace Infrastructure.Utilities
             return result;
         }
 
+        /// <summary>
+        /// Gets the Ip address of the host
+        /// </summary>
+        /// <returns>Returns host's ip address where the program is running</returns>
         public static string GetIpAddress()
         {
             string ipAddress = null;
-            string hostname = Environment.MachineName; IPHostEntry host = Dns.GetHostEntry(hostname);
+            string hostname = Environment.MachineName;
+            IPHostEntry host = Dns.GetHostEntry(hostname);
 
             foreach (var ip in host.AddressList.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork))
             {
@@ -371,56 +382,61 @@ namespace Infrastructure.Utilities
             return ipAddress;
         }
 
-        public static TResult DeserializarJson<TResult>(string json)
+        /// <summary>
+        /// Creates a file as of its bytes
+        /// </summary>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
+        /// <param name="bytes">Bytes to write the file</param>
+        /// <returns>Resturns whether the file was created or not</returns>
+        public static bool CreateFileFromItsBytes(string pathName, byte[] bytes)
         {
-            //return JsonConvert.DeserializeObject<TResult>(json);
-            throw new NotImplementedException();
-        }
-
-        public static string SerializarAJson<T>(T source)
-        {
-            //return JsonConvert.SerializeObject(source);
-            throw new NotImplementedException();
-        }
-
-        public static bool CrearImagenDeBytes(string rutaArchivo, byte[] bytesImagen)
-        {
-            if (string.IsNullOrWhiteSpace(rutaArchivo) || bytesImagen == null || bytesImagen.Length == 0)
+            if (string.IsNullOrWhiteSpace(pathName) || bytes == null || bytes.Length == 0)
                 return false;
 
-            if (!Directory.Exists(Path.GetPathRoot(rutaArchivo)))
+            if (!Directory.Exists(Path.GetPathRoot(pathName)))
                 return false;
 
-            var rutaDirectorio = Path.GetDirectoryName(rutaArchivo);
-            if (!Directory.Exists(rutaDirectorio))
-                Directory.CreateDirectory(rutaDirectorio);
+            var directory = Path.GetDirectoryName(pathName);
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
 
-            using (var fs = new FileStream(rutaArchivo, FileMode.Create))
+            using (var fs = new FileStream(pathName, FileMode.Create))
             {
-                fs.Write(bytesImagen, 0, bytesImagen.Length);
+                fs.Write(bytes, 0, bytes.Length);
                 fs.Close();
             }
             return true;
         }
 
-        public static DateTime? ConvertStringToDate(string fechaEmision, string formato)
+        /// <summary>
+        /// Converts a string to object <see cref="DateTime"/>
+        /// </summary>
+        /// <param name="date">string of the date</param>
+        /// <param name="format">Format to convert the 'date' string </param>
+        /// <returns>Returns the date (<see cref="DateTime"/>) already converted, if it returns null, it was not possible to convert date</returns>
+        public static DateTime? ConvertStringToDate(string date, string format)
         {
-            DateTime fechaConvertida;
-            if (!DateTime.TryParseExact(fechaEmision, formato, CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaConvertida))
+            if (!DateTime.TryParseExact(date, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime convertedDate))
             {
                 return null;
             }
-            return fechaConvertida;
+
+            return convertedDate;
         }
 
-        public static DateTime? ConvertStringToDateUtc(string fechaEmision, string formato)
+        /// <summary>
+        /// Converts a string to object <see cref="DateTime"/> UTC
+        /// </summary>
+        /// <param name="date">string of the date</param>
+        /// <param name="format">Format to convert the 'date' string </param>
+        /// <returns>Returns the date (<see cref="DateTime"/>) already converted, if it returns null, it was not possible to convert date</returns>
+        public static DateTime? ConvertStringToDateUtc(string date, string format)
         {
-            DateTime fechaConvertida;
-            if (!DateTime.TryParseExact(fechaEmision, formato, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeLocal, out fechaConvertida))
+            if (!DateTime.TryParseExact(date, format, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeLocal, out DateTime convertedDate))
             {
                 return null;
             }
-            return fechaConvertida;
+            return convertedDate;
         }
     }
 
@@ -432,7 +448,7 @@ namespace Infrastructure.Utilities
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static T DecompressSnapshot<T>(string path)
+        public static T Decompress<T>(string path)
         {
             FileInfo fileInfo = null;
             T result;
@@ -452,7 +468,7 @@ namespace Infrastructure.Utilities
                 if (!fileInfo.Exists)
                     throw new FileNotFoundException($"The zip-file was not found. {fileInfo.FullName}");
 
-                result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+                result = Helper.ReadFileJson<T>(fileInfo.FullName);
             }
             finally
             {
@@ -470,7 +486,7 @@ namespace Infrastructure.Utilities
         /// <param name="path"></param>
         /// <param name="pathExtractTo"></param>
         /// <returns></returns>
-        public static FileInfo DecompressSnapshot(string path, string pathExtractTo)
+        public static FileInfo Decompress(string path, string pathExtractTo)
         {
             FileInfo fileInfo = null;
             FileInfo result;
@@ -511,7 +527,7 @@ namespace Infrastructure.Utilities
         /// <param name="path"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static T DecompressSnapshot<T>(string path, string password)
+        public static T Decompress<T>(string path, string password)
         {
             var fileInfo = new FileInfo(path);
             if (!fileInfo.Exists)
@@ -527,7 +543,7 @@ namespace Infrastructure.Utilities
             if (!fileInfo.Exists)
                 throw new FileNotFoundException($"The zip-file was not found. {fileInfo.FullName}");
 
-            T result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
 
             if (!fileInfo.Exists)
                 fileInfo.Delete();
@@ -541,7 +557,7 @@ namespace Infrastructure.Utilities
         /// <typeparam name="T"></typeparam>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
-        public static T DecompressSnapshot<T>(FileInfo fileInfo)
+        public static T Decompress<T>(FileInfo fileInfo)
         {
             using (var zip = ZipFile.Read(fileInfo.FullName))
             {
@@ -552,7 +568,7 @@ namespace Infrastructure.Utilities
             if (!fileInfo.Exists)
                 throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
 
-            T result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
 
             if (!fileInfo.Exists)
                 fileInfo.Delete();
@@ -567,7 +583,7 @@ namespace Infrastructure.Utilities
         /// <param name="fileInfo"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static T DecompressSnapshot<T>(FileInfo fileInfo, string password)
+        public static T Decompress<T>(FileInfo fileInfo, string password)
         {
             using (var zip = ZipFile.Read(fileInfo.FullName))
             {
@@ -579,7 +595,7 @@ namespace Infrastructure.Utilities
             if (!fileInfo.Exists)
                 throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
 
-            T result = Helper.ReadFileTxt<T>(fileInfo.FullName);
+            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
 
             if (!fileInfo.Exists)
                 fileInfo.Delete();
@@ -594,7 +610,7 @@ namespace Infrastructure.Utilities
         /// <param name="source"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string CompressSnapshot<T>(T source, string path)
+        public static string Compress<T>(T source, string path)
         {
             string pathFileZip = String.Empty;
 
@@ -623,7 +639,7 @@ namespace Infrastructure.Utilities
             return pathFileZip;
         }
 
-        public static string CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip)
+        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip)
         {
             string pathFileZip = String.Empty;
 
@@ -648,7 +664,7 @@ namespace Infrastructure.Utilities
             return pathFileZip;
         }
 
-        public static string CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, string password)
+        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip, string password)
         {
             string pathFileZip = String.Empty;
 
@@ -674,7 +690,7 @@ namespace Infrastructure.Utilities
             return pathFileZip;
         }
 
-        public static string CompressSnapshot<T>(T source, string path, string password)
+        public static string Compress<T>(T source, string path, string password)
         {
             string pathFileZip = String.Empty;
 
@@ -702,44 +718,9 @@ namespace Infrastructure.Utilities
                 fileInfo.Delete();
 
             return pathFileZip;
-        }
+        }       
 
-        public static void CompressSnapshotCsv<T>(IEnumerable<T> source, string path, out FileInfo fileInfoFileZip)
-        {
-            string pathName = null;
-
-            try
-            {
-                string pathFileZip = string.Empty;
-
-                var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
-                if (!directoryInfoZip.Exists)
-                    directoryInfoZip.Create();
-
-                var fileTxt = string.Format(Path.GetFileNameWithoutExtension(path));
-                Helper.CreateCSVFile<T>(";", source, Path.GetTempPath(), fileTxt, out pathName);
-
-                if (string.IsNullOrEmpty(pathName))
-                    throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-                using (ZipFile zip = new ZipFile())
-                {
-                    pathFileZip = Path.Combine(directoryInfoZip.FullName, $"{fileTxt}.zip");
-                    zip.AddFile(pathName, string.Empty);
-                    zip.Save(pathFileZip);
-                }
-
-                fileInfoFileZip = new FileInfo(pathFileZip);
-            }
-            finally
-            {
-                var fileInfo = new FileInfo(pathName);
-                if (fileInfo.Exists)
-                    fileInfo.Delete();
-            }
-        }
-
-        public static void CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, out FileInfo fileInfoFileZip)
+        public static void Compress<T>(T source, DirectoryInfo directoryInfoZip, out FileInfo fileInfoFileZip)
         {
             string pathFileZip = String.Empty;
 
@@ -764,7 +745,7 @@ namespace Infrastructure.Utilities
             fileInfoFileZip = new FileInfo(pathFileZip);
         }
 
-        public static void CompressSnapshot<T>(T source, string path, string password, out FileInfo fileInfoFileZip)
+        public static void Compress<T>(T source, string path, string password, out FileInfo fileInfoFileZip)
         {
             string pathFileZip = String.Empty;
 
@@ -794,7 +775,7 @@ namespace Infrastructure.Utilities
             fileInfoFileZip = new FileInfo(pathFileZip);
         }
 
-        public static void CompressSnapshot<T>(T source, DirectoryInfo directoryInfoZip, string password, out FileInfo fileInfoFileZip)
+        public static void Compress<T>(T source, DirectoryInfo directoryInfoZip, string password, out FileInfo fileInfoFileZip)
         {
             string pathFileZip = String.Empty;
 
