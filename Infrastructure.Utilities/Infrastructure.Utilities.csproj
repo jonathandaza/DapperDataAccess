@@ -57,6 +57,7 @@
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Zip.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
