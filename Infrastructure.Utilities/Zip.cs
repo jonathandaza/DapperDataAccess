@@ -16,11 +16,11 @@ namespace Infrastructure.Utilities
         const string ZIP_FILE_NO_FOUND = "Zip file was not found";
 
         /// <summary>
-        /// 
+        /// Decompresses a JSON file from a path
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">Type of object to deserialize the JSON</typeparam>
+        /// <param name="path">file path (including file name) where the file will be read.</param>
+        /// <returns>Returns a <see cref="T"/> object containing the object already deserialized</returns>
         public static T DecompressJsonFile<T>(string path)
         {
             FileInfo fileInfo = null;
@@ -60,6 +60,14 @@ namespace Infrastructure.Utilities
             return result;
         }
 
+        /// <summary>
+        /// Decompresses a JSON file from a path
+        /// </summary>
+        /// <typeparam name="T">Type of object to deserialize the JSON</typeparam>
+        /// <param name="path">file path (including file name) where the file will be read.</param>
+        /// <param name="extensionFile">File's extension, if the zip file has more than one file compressed, 
+        /// and there are either a json or text (any file of type TEXT) inside, this is decompressed and deserialized.</param>
+        /// <returns>Returns a <see cref="T"/> object containing the object already deserialized</returns>
         public static T DecompressJsonFile<T>(string path, string extensionFile)
         {
             FileInfo fileInfo = null;
