@@ -19,9 +19,10 @@ namespace Infrastructure.Utilities
         /// Decompresses a JSON file from a path
         /// </summary>
         /// <typeparam name="T">Type of object to deserialize the JSON</typeparam>
-        /// <param name="path">file path (including file name) where the file will be read.</param>
+        /// <param name="path">Zip path (including file name) where the file will be read.</param>
+        /// <param name="password">password to be used on the ZipFile instance.</param>
         /// <returns>Returns a <see cref="T"/> object containing the object already deserialized</returns>
-        public static T DecompressJsonFile<T>(string path)
+        public static T DecompressJsonFile<T>(string path, string password = null)
         {
             FileInfo fileInfo = null;
             IEnumerable<ZipEntry> zipFile;
@@ -35,6 +36,9 @@ namespace Infrastructure.Utilities
 
                 using (var zip = ZipFile.Read(fileInfo.FullName))
                 {
+                    if (!string.IsNullOrEmpty(password))
+                        zip.Password = password;
+
                     zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
                     zipFile = zip.Where(c => c.FileName.EndsWith(FILE_JSON));
                 }
@@ -64,11 +68,12 @@ namespace Infrastructure.Utilities
         /// Decompresses a JSON file from a path
         /// </summary>
         /// <typeparam name="T">Type of object to deserialize the JSON</typeparam>
-        /// <param name="path">file path (including file name) where the file will be read.</param>
+        /// <param name="path">Zip path (including file name) where the file will be read.</param>
         /// <param name="extensionFile">File's extension, if the zip file has more than one file compressed, 
         /// and there are either a json or text (any file of type TEXT) inside, this is decompressed and deserialized.</param>
+        /// <param name="password">password to be used on the ZipFile instance.</param>
         /// <returns>Returns a <see cref="T"/> object containing the object already deserialized</returns>
-        public static T DecompressJsonFile<T>(string path, string extensionFile)
+        public static T DecompressJsonFile<T>(string path, string extensionFile, string password = null)
         {
             FileInfo fileInfo = null;
             IEnumerable<ZipEntry> zipFile;
@@ -82,6 +87,9 @@ namespace Infrastructure.Utilities
 
                 using (var zip = ZipFile.Read(fileInfo.FullName))
                 {
+                    if (!string.IsNullOrEmpty(password))
+                        zip.Password = password;
+
                     zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
                     zipFile = zip.Where(c => c.FileName.EndsWith(extensionFile));
                 }
@@ -107,7 +115,15 @@ namespace Infrastructure.Utilities
             return result;
         }
 
-        public static T DecompressJsonFileFromFileName<T>(string path, string fileName)
+        /// <summary>
+        /// Decompresses a JSON file from a specific file name
+        /// </summary>
+        /// <typeparam name="T">Type of object to deserialize the JSON</typeparam>
+        /// <param name="path">Zip path (including file name) where the file will be read.</param>
+        /// <param name="fileName">File name which is compressed into the ZIP</param>
+        /// <param name="password">password to be used on the ZipFile instance.</param>
+        /// <returns>Returns a <see cref="T"/> object containing the object already deserialized</returns>
+        public static T DecompressJsonFileFromFileName<T>(string path, string fileName, string password = null)
         {
             FileInfo fileInfo = null;
             IEnumerable<ZipEntry> zipFile;
@@ -121,6 +137,9 @@ namespace Infrastructure.Utilities
 
                 using (var zip = ZipFile.Read(fileInfo.FullName))
                 {
+                    if (!string.IsNullOrEmpty(password))
+                        zip.Password = password;
+
                     zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
                     zipFile = zip.Where(c => c.FileName.Contains(fileName)).ToList();
                 }
@@ -149,12 +168,13 @@ namespace Infrastructure.Utilities
         }
 
         /// <summary>
-        /// 
+        /// Descompresses the zip files forward a directory
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="pathExtractTo"></param>
-        /// <returns></returns>
-        public static DirectoryInfo Decompress(string path, string pathExtractTo)
+        /// <param name="path">Zip path (including file name) where the file will be read.</param>
+        /// <param name="pathExtractTo">Path where files will be descompressed, if 'pathExtractTo' does not exist, this path will be created</param>
+        /// <param name="password">password to be used on the ZipFile instance.</param>
+        /// <returns>Returns a <see cref="DirectoryInfo"/> object, where file were descompressed or laid</returns>
+        public static DirectoryInfo Decompress(string path, string pathExtractTo, string password = null)
         {
             FileInfo fileInfo = null;
             DirectoryInfo result;
@@ -172,6 +192,9 @@ namespace Infrastructure.Utilities
 
                 using (var zip = ZipFile.Read(fileInfo.FullName))
                 {
+                    if (!string.IsNullOrEmpty(password))
+                        zip.Password = password;
+
                     zip.ExtractAll(pathExtractTo, ExtractExistingFileAction.OverwriteSilently);
                 }
 
@@ -186,91 +209,8 @@ namespace Infrastructure.Utilities
             if (result.Exists) return result;
 
             return null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="path"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(string path, string password)
-        {
-            var fileInfo = new FileInfo(path);
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"{FILE_DOES_NOT_EXIST}. {path}");
-
-            using (var zip = ZipFile.Read(fileInfo.FullName))
-            {
-                zip.Password = password;
-                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-            }
-
-            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"{ZIP_FILE_NO_FOUND}. {fileInfo.FullName}");
-
-            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
-
-            if (!fileInfo.Exists)
-                fileInfo.Delete();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="fileInfo"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(FileInfo fileInfo)
-        {
-            using (var zip = ZipFile.Read(fileInfo.FullName))
-            {
-                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-            }
-
-            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
-
-            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
-
-            if (!fileInfo.Exists)
-                fileInfo.Delete();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="fileInfo"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(FileInfo fileInfo, string password)
-        {
-            using (var zip = ZipFile.Read(fileInfo.FullName))
-            {
-                zip.Password = password;
-                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-            }
-
-            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
-
-            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
-
-            if (!fileInfo.Exists)
-                fileInfo.Delete();
-
-            return result;
-        }
-
+        }   
+        
         /// <summary>
         /// 
         /// </summary>
