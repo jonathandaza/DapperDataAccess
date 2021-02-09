@@ -10,6 +10,7 @@
 5. Hosting: selfhost or IIS
 6. Bring auto-mapper from T9.Agente project
 7. Create unit of work pattern
+8. Create LoggerFile and LoggerConsole class, which is handled by queues
 
 
 resorces:
