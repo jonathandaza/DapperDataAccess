@@ -311,19 +311,88 @@ namespace Infrastructure.Utilities
         }
 
         /// <summary>
-        /// Creates TXT file from a <see cref="T"/> object
+        /// Creates a file's extension .txt from a <see cref="T"/> object
         /// </summary>
         /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
         /// <param name="source">Object containing the data in order to be written</param>
         /// <param name="folder">Folder path where the file will be created</param>
         /// <param name="fileName">File name (without extension)</param>
         /// <param name="pathName">Contains the whole path where the file will be written</param>
-        public static void CreateTXTFile<T>(T source, string folder, string fileName, out string pathName)
+        public static void CreateTxtTextFile<T>(T source, string folder, string fileName, out string pathName)
         {
             const string fileExtension = ".txt";
             try
             {
                 pathName = Path.Combine(folder, $"{(fileName.Contains(fileExtension) ? fileName : fileName + fileExtension)}");
+
+                var directoryInfo = new DirectoryInfo(folder);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (StreamWriter file = File.CreateText(pathName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+
+                    //serialize object directly into file stream
+                    serializer.Serialize(file, source);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates text file from a <see cref="T"/> object with any extension
+        /// </summary>
+        /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
+        /// <param name="source">Object containing the data in order to be written</param>
+        /// <param name="folder">Folder path where the file will be created</param>
+        /// <param name="fileName">File name (without extension)</param>
+        /// <param name="fileExtension">Extension name, the dot (.) symbol is compulsory, eg: .txt, .json, .cvs, so on.</param>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
+        public static void CreateTextFile<T>(T source, string folder, string fileName, string fileExtension, out string pathName)
+        {
+            try
+            {
+                pathName = Path.Combine(folder, $"{(fileName.Contains(fileExtension) ? fileName : fileName + fileExtension)}");
+
+                var directoryInfo = new DirectoryInfo(folder);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (StreamWriter file = File.CreateText(pathName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+
+                    //serialize object directly into file stream
+                    serializer.Serialize(file, source);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates text file from a <see cref="T"/> object with any extension
+        /// </summary>
+        /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
+        /// <param name="source">Object containing the data in order to be written</param>
+        /// <param name="folder">Folder path where the file will be created</param>
+        /// <param name="fileName">File name (without extension)</param>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
+        public static void CreateTextFile<T>(T source, string folder, string fileName, out string pathName)
+        {
+            try
+            {
+                pathName = Path.Combine(folder, $"{ fileName }");
+
+                if (!Path.HasExtension(pathName))
+                    throw new FormatException($"{fileName} requires an extension.");
+
 
                 var directoryInfo = new DirectoryInfo(folder);
                 if (!directoryInfo.Exists)
