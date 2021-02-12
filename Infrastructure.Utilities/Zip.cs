@@ -12,6 +12,7 @@ namespace Infrastructure.Utilities
     public static class Zip
     {
         const string FILE_JSON = ".json";
+        const string FILE_TEXT = ".txt";
         const string FILE_DOES_NOT_EXIST = "File does not exist.";
         const string ZIP_FILE_NO_FOUND = "Zip file was not found";
 
@@ -209,34 +210,45 @@ namespace Infrastructure.Utilities
             if (result.Exists) return result;
 
             return null;
-        }   
-        
+        }
+
         /// <summary>
-        /// 
+        /// Compresses <see cref="T"/> source to a zip file
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string Compress<T>(T source, string path)
+        /// <typeparam name="T">Type of object to serialize</typeparam>
+        /// <param name="source">Source information for being compressed</param>
+        /// <param name="path">path and name file where the file will be written and compressed</param>
+        /// <param name="extensionFile">file's extension. 'path' could include file's extension, otherwise, it will take 'extensionFile', or by default it will be .JSON </param>
+        /// <returns>returns path where zip file was written.</returns>
+        public static string Compress<T>(T source, string path, string extensionFile = null)
         {
-            string pathFileZip = String.Empty;
+            string pathFileZip = string.Empty;           
+
+            if (!Path.HasExtension(path))
+            {
+                if (!string.IsNullOrEmpty(extensionFile))
+                {
+                    path += extensionFile;
+                }
+                else
+                {
+                    path += FILE_JSON;
+                }
+            }
 
             var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
             if (!directoryInfoZip.Exists)
                 directoryInfoZip.Create();
 
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
+            Helper.CreateTextFile(source, Path.GetTempPath(), directoryInfoZip.Name, out string pathName);
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+            if (string.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"{FILE_DOES_NOT_EXIST}. { Path.Combine(Path.GetTempPath(), directoryInfoZip.Name) }");
 
             using (ZipFile zip = new ZipFile())
             {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.AddFile(pathName, String.Empty);
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{Path.GetFileNameWithoutExtension(directoryInfoZip.Name)}.zip");
+                zip.AddFile(pathName, string.Empty);
                 zip.Save(pathFileZip);
             }
 
@@ -247,20 +259,25 @@ namespace Infrastructure.Utilities
             return pathFileZip;
         }
 
+        /// <summary>
+        /// Compresses <see cref="T"/> source to a zip file
+        /// </summary>
+        /// <typeparam name="T">Type of object to serialize</typeparam>
+        /// <param name="source">Source information for being compressed</param>
+        /// <param name="directoryInfoZip">Path where the file will be writtern and compressed</param>
+        /// <returns>returns path where zip file was written.</returns>
         public static string Compress<T>(T source, DirectoryInfo directoryInfoZip)
         {
-            string pathFileZip = String.Empty;
+            string pathFileZip = string.Empty;
 
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
+            Helper.CreateTextFile(source, Path.GetTempPath(), directoryInfoZip.Name, out string pathName);
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
+            if (string.IsNullOrEmpty(pathName))
+                throw new FileNotFoundException($"{FILE_DOES_NOT_EXIST}. { Path.Combine(Path.GetTempPath(), directoryInfoZip.Name) }");
 
             using (ZipFile zip = new ZipFile())
             {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{Path.GetFileNameWithoutExtension(directoryInfoZip.Name)}.zip");
                 zip.AddFile(pathName, String.Empty);
                 zip.Save(pathFileZip);
             }
@@ -278,7 +295,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTxtTextFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -308,7 +325,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTxtTextFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -334,7 +351,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTxtTextFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -363,7 +380,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTxtTextFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
@@ -389,7 +406,7 @@ namespace Infrastructure.Utilities
 
             var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
 
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
+            Helper.CreateTxtTextFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
 
             if (String.IsNullOrEmpty(pathName))
                 throw new FileNotFoundException($"No se encontró el archivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
