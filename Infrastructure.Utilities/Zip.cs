@@ -13,6 +13,8 @@ namespace Infrastructure.Utilities
     {
         const string FILE_JSON = ".json";
         const string FILE_TEXT = ".txt";
+        const string FILE_ZIP = ".zip";
+
         const string FILE_DOES_NOT_EXIST = "File does not exist.";
         const string ZIP_FILE_NO_FOUND = "Zip file was not found";
 
@@ -220,7 +222,7 @@ namespace Infrastructure.Utilities
         /// <param name="path">path and name file where the file will be written and compressed</param>
         /// <param name="extensionFile">file's extension. 'path' could include file's extension, otherwise, it will take 'extensionFile', or by default it will be .JSON </param>
         /// <returns>returns path where zip file was written.</returns>
-        public static string Compress<T>(T source, string path, string extensionFile = null)
+        public static string Compress<T>(T source, string path, string extensionFile = null, string password = null)
         {
             string pathFileZip = string.Empty;           
 
@@ -247,7 +249,10 @@ namespace Infrastructure.Utilities
 
             using (ZipFile zip = new ZipFile())
             {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{Path.GetFileNameWithoutExtension(directoryInfoZip.Name)}.zip");
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{Path.GetFileNameWithoutExtension(directoryInfoZip.Name)}{FILE_ZIP}");
+                if (!string.IsNullOrEmpty(password))
+                    zip.Password = password;
+
                 zip.AddFile(pathName, string.Empty);
                 zip.Save(pathFileZip);
             }
@@ -266,7 +271,7 @@ namespace Infrastructure.Utilities
         /// <param name="source">Source information for being compressed</param>
         /// <param name="directoryInfoZip">Path where the file will be writtern and compressed</param>
         /// <returns>returns path where zip file was written.</returns>
-        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip)
+        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip, string password = null)
         {
             string pathFileZip = string.Empty;
 
@@ -277,8 +282,11 @@ namespace Infrastructure.Utilities
 
             using (ZipFile zip = new ZipFile())
             {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{Path.GetFileNameWithoutExtension(directoryInfoZip.Name)}.zip");
-                zip.AddFile(pathName, String.Empty);
+                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{Path.GetFileNameWithoutExtension(directoryInfoZip.Name)}{ FILE_ZIP }");
+                if (!string.IsNullOrEmpty(password))
+                    zip.Password = password;
+
+                zip.AddFile(pathName, string.Empty);
                 zip.Save(pathFileZip);
             }
 
@@ -287,33 +295,7 @@ namespace Infrastructure.Utilities
                 fileInfo.Delete();
 
             return pathFileZip;
-        }
-
-        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip, string password)
-        {
-            string pathFileZip = String.Empty;
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
-
-            Helper.CreateTxtTextFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.Password = password;
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            return pathFileZip;
-        }
+        }        
 
         public static string Compress<T>(T source, string path, string password)
         {
