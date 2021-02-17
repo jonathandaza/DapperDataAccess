@@ -56,6 +56,7 @@
     <Compile Include="Extensions\SerializerDeserializerExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Logger\ILogEvent.cs" />
     <Compile Include="Logger\TextLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Zip.cs" />
