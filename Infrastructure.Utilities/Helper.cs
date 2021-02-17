@@ -1,4 +1,4 @@
-﻿using Ionic.Zip;
+﻿
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace Infrastructure.Utilities
     {
         const string FILE_XLS = ".xls";
         const string FILE_XLSX = ".xlsx";
-        const string FILE_CSV = ".csv";
+        const string FILE_CSV = ".csv";        
 
 
         /// <summary>
@@ -311,19 +311,88 @@ namespace Infrastructure.Utilities
         }
 
         /// <summary>
-        /// Creates TXT file from a <see cref="T"/> object
+        /// Creates a file's extension .txt from a <see cref="T"/> object
         /// </summary>
         /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
         /// <param name="source">Object containing the data in order to be written</param>
         /// <param name="folder">Folder path where the file will be created</param>
         /// <param name="fileName">File name (without extension)</param>
         /// <param name="pathName">Contains the whole path where the file will be written</param>
-        public static void CreateTXTFile<T>(T source, string folder, string fileName, out string pathName)
+        public static void CreateTxtTextFile<T>(T source, string folder, string fileName, out string pathName)
         {
             const string fileExtension = ".txt";
             try
             {
                 pathName = Path.Combine(folder, $"{(fileName.Contains(fileExtension) ? fileName : fileName + fileExtension)}");
+
+                var directoryInfo = new DirectoryInfo(folder);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (StreamWriter file = File.CreateText(pathName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+
+                    //serialize object directly into file stream
+                    serializer.Serialize(file, source);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates text file from a <see cref="T"/> object with any extension
+        /// </summary>
+        /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
+        /// <param name="source">Object containing the data in order to be written</param>
+        /// <param name="folder">Folder path where the file will be created</param>
+        /// <param name="fileName">File name (without extension)</param>
+        /// <param name="fileExtension">Extension name, the dot (.) symbol is compulsory, eg: .txt, .json, .cvs, so on.</param>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
+        public static void CreateTextFile<T>(T source, string folder, string fileName, string fileExtension, out string pathName)
+        {
+            try
+            {
+                pathName = Path.Combine(folder, $"{(fileName.Contains(fileExtension) ? fileName : fileName + fileExtension)}");
+
+                var directoryInfo = new DirectoryInfo(folder);
+                if (!directoryInfo.Exists)
+                    directoryInfo.Create();
+
+                using (StreamWriter file = File.CreateText(pathName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+
+                    //serialize object directly into file stream
+                    serializer.Serialize(file, source);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates text file from a <see cref="T"/> object with any extension
+        /// </summary>
+        /// <typeparam name="T">Type of object containing the data in order to be written</typeparam>
+        /// <param name="source">Object containing the data in order to be written</param>
+        /// <param name="folder">Folder path where the file will be created</param>
+        /// <param name="fileName">File name (without extension)</param>
+        /// <param name="pathName">Contains the whole path where the file will be written</param>
+        public static void CreateTextFile<T>(T source, string folder, string fileName, out string pathName)
+        {
+            try
+            {
+                pathName = Path.Combine(folder, $"{ fileName }");
+
+                if (!Path.HasExtension(pathName))
+                    throw new FormatException($"{fileName} requires an extension.");
+
 
                 var directoryInfo = new DirectoryInfo(folder);
                 if (!directoryInfo.Exists)
@@ -438,368 +507,6 @@ namespace Infrastructure.Utilities
             }
             return convertedDate;
         }
-    }
-
-    public static class Zip
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(string path)
-        {
-            FileInfo fileInfo = null;
-            T result;
-
-            try
-            {
-                fileInfo = new FileInfo(path);
-                if (!fileInfo.Exists)
-                    throw new FileNotFoundException($"File does not exist. {path}");
-
-                using (var zip = ZipFile.Read(fileInfo.FullName))
-                {
-                    zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-                }
-
-                fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-                if (!fileInfo.Exists)
-                    throw new FileNotFoundException($"The zip-file was not found. {fileInfo.FullName}");
-
-                result = Helper.ReadFileJson<T>(fileInfo.FullName);
-            }
-            finally
-            {
-                if (!fileInfo.Exists)
-                    fileInfo.Delete();
-            }
-
-            return result;
-
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="pathExtractTo"></param>
-        /// <returns></returns>
-        public static FileInfo Decompress(string path, string pathExtractTo)
-        {
-            FileInfo fileInfo = null;
-            FileInfo result;
-            DirectoryInfo directoryInfo = null;
-
-            try
-            {
-                fileInfo = new FileInfo(path);
-                if (!fileInfo.Exists)
-                    throw new FileNotFoundException($"File does not exist. {path}");
-
-                directoryInfo = new DirectoryInfo(pathExtractTo);
-                if (!directoryInfo.Exists)
-                    directoryInfo.Create();
-
-                using (var zip = ZipFile.Read(fileInfo.FullName))
-                {
-                    zip.ExtractAll(pathExtractTo, ExtractExistingFileAction.OverwriteSilently);
-                }
-
-                result = new FileInfo(Path.Combine(pathExtractTo, $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            }
-            finally
-            {
-                if (!fileInfo.Exists)
-                    fileInfo.Delete();
-            }
-
-            if (result.Exists) return result;
-
-            return null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="path"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(string path, string password)
-        {
-            var fileInfo = new FileInfo(path);
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"File does not exist. {path}");
-
-            using (var zip = ZipFile.Read(fileInfo.FullName))
-            {
-                zip.Password = password;
-                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-            }
-
-            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"The zip-file was not found. {fileInfo.FullName}");
-
-            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
-
-            if (!fileInfo.Exists)
-                fileInfo.Delete();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="fileInfo"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(FileInfo fileInfo)
-        {
-            using (var zip = ZipFile.Read(fileInfo.FullName))
-            {
-                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-            }
-
-            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
-
-            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
-
-            if (!fileInfo.Exists)
-                fileInfo.Delete();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="fileInfo"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        public static T Decompress<T>(FileInfo fileInfo, string password)
-        {
-            using (var zip = ZipFile.Read(fileInfo.FullName))
-            {
-                zip.Password = password;
-                zip.ExtractAll(Path.GetTempPath(), ExtractExistingFileAction.OverwriteSilently);
-            }
-
-            fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}.txt"));
-            if (!fileInfo.Exists)
-                throw new FileNotFoundException($"No se encontró el archivo descomprimido {fileInfo.FullName}.");
-
-            T result = Helper.ReadFileJson<T>(fileInfo.FullName);
-
-            if (!fileInfo.Exists)
-                fileInfo.Delete();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string Compress<T>(T source, string path)
-        {
-            string pathFileZip = String.Empty;
-
-            var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
-            if (!directoryInfoZip.Exists)
-                directoryInfoZip.Create();
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            return pathFileZip;
-        }
-
-        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip)
-        {
-            string pathFileZip = String.Empty;
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            return pathFileZip;
-        }
-
-        public static string Compress<T>(T source, DirectoryInfo directoryInfoZip, string password)
-        {
-            string pathFileZip = String.Empty;
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.Password = password;
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            return pathFileZip;
-        }
-
-        public static string Compress<T>(T source, string path, string password)
-        {
-            string pathFileZip = String.Empty;
-
-            var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
-            if (!directoryInfoZip.Exists)
-                directoryInfoZip.Create();
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.Password = password;
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            return pathFileZip;
-        }       
-
-        public static void Compress<T>(T source, DirectoryInfo directoryInfoZip, out FileInfo fileInfoFileZip)
-        {
-            string pathFileZip = String.Empty;
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            fileInfoFileZip = new FileInfo(pathFileZip);
-        }
-
-        public static void Compress<T>(T source, string path, string password, out FileInfo fileInfoFileZip)
-        {
-            string pathFileZip = String.Empty;
-
-            var directoryInfoZip = new DirectoryInfo(Path.GetDirectoryName(path));
-            if (!directoryInfoZip.Exists)
-                directoryInfoZip.Create();
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(path));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el arcvhivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.Password = password;
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            fileInfoFileZip = new FileInfo(pathFileZip);
-        }
-
-        public static void Compress<T>(T source, DirectoryInfo directoryInfoZip, string password, out FileInfo fileInfoFileZip)
-        {
-            string pathFileZip = String.Empty;
-
-            var fileTxt = String.Format(Path.GetFileNameWithoutExtension(directoryInfoZip.Name));
-
-            Helper.CreateTXTFile<T>(source, Path.GetTempPath(), fileTxt, out string pathName);
-
-            if (String.IsNullOrEmpty(pathName))
-                throw new FileNotFoundException($"No se encontró el archivo en la ruta: { Path.Combine(Path.GetTempPath(), fileTxt) }");
-
-            using (ZipFile zip = new ZipFile())
-            {
-                pathFileZip = Path.Combine(Path.GetDirectoryName(directoryInfoZip.FullName), $"{fileTxt}.zip");
-                zip.Password = password;
-                zip.AddFile(pathName, String.Empty);
-                zip.Save(pathFileZip);
-            }
-
-            var fileInfo = new FileInfo(pathName);
-            if (fileInfo.Exists)
-                fileInfo.Delete();
-
-            fileInfoFileZip = new FileInfo(pathFileZip);
-        }
-    }
+    }   
 }
 

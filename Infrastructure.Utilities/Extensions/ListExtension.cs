@@ -31,7 +31,7 @@ namespace Infrastructure.Helper.Utilities.Extensions
         /// <typeparam name="T">Tipo de dato de la lista</typeparam>
         /// <param name="source">Objeto de tipo lista</param>
         /// <returns>Devuelve true si la lista es nula o vacia</returns>
-        public static bool IsNullOrEmpty<T>(this ICollection<T> source)
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
         {
             if ((source == null) || (!source.Any()))
                 return true;
